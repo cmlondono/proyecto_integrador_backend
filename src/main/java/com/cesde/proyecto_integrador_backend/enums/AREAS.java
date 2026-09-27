@@ -1,0 +1,23 @@
+package com.cesde.proyecto_integrador_backend.enums;
+
+public enum AREAS {
+    ADMINISTRACION,
+    FINANZAS,
+    RECURSOS_HUMANOS,
+    TECNOLOGIA,
+    MARKETING,
+    VENTAS,
+    OPERACIONES,
+    LOGISTICA,
+    PRODUCCION,
+    INVESTIGACION_DESARROLLO,
+    SERVICIO_CLIENTE,
+    LEGAL,
+    COMPRAS,
+    CALIDAD,
+    SALUD,
+    SEGURIDAD,
+    EDUCACION,
+    MEDIO_AMBIENTE,
+    OTROS
+}
