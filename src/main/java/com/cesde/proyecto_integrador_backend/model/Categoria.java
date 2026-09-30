@@ -1,7 +1,6 @@
 package com.cesde.proyecto_integrador_backend.model;
 
 import jakarta.persistence.*;
-import org.springframework.data.annotation.Id;
 
 import com.cesde.proyecto_integrador_backend.enums.AREAS;
 import jakarta.validation.constraints.NotBlank;
