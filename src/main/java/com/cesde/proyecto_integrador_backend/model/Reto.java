@@ -21,6 +21,7 @@ public class Reto {
     private String nombre;
 
     @NotBlank(message = "La descripción es obligatoria")
+    @Column(columnDefinition = "TEXT")
     private String descripcion;
 
     @NotNull(message = "La fecha de inicio es obligatorio")

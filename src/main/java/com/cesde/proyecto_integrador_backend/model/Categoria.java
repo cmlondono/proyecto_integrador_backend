@@ -19,7 +19,7 @@ public class Categoria {
     private String nombre;
 
     @NotBlank(message = "La descripción es obligatoria")
-    @Column(name = "descripcion", nullable = false)
+    @Column(name = "descripcion", nullable = false, columnDefinition = "TEXT")
     private String descripcion;
 
     @NotNull(message = "El área responsable es obligatoria")

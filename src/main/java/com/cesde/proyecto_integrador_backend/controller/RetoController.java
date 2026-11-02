@@ -25,8 +25,8 @@ public class RetoController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Reto>> listar() {
-        return ResponseEntity.ok(retoService.listarRetos());
+    public ResponseEntity<List<Reto>> listar(@RequestParam(required = false) UUID empresaId) {
+        return ResponseEntity.ok(retoService.listarRetos(empresaId));
     }
 
     @GetMapping("/{id}")

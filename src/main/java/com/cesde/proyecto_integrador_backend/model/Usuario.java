@@ -36,6 +36,11 @@ public class Usuario {
     @Enumerated(EnumType.STRING)
     private ROLES rol;
 
+    // Solo aplica cuando rol = EMPRESA: a cuál empresa representa esta cuenta
+    @ManyToOne
+    @JoinColumn(name = "empresa_id", referencedColumnName = "id")
+    private Empresa empresa;
+
     public Usuario() {
     }
 
@@ -85,5 +90,13 @@ public class Usuario {
 
     public void setRol(ROLES rol) {
         this.rol = rol;
+    }
+
+    public Empresa getEmpresa() {
+        return empresa;
+    }
+
+    public void setEmpresa(Empresa empresa) {
+        this.empresa = empresa;
     }
 }

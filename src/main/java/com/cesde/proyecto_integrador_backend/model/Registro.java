@@ -32,6 +32,14 @@ public class Registro {
     @Column(name = "estado", nullable = false)
     private EstadoRegistro estado;
 
+    // Cuándo se aceptó (null si todavía no se acepta)
+    @Column(name = "fecha_aceptacion")
+    private LocalDateTime fechaAceptacion;
+
+    // Cuándo se finalizó (null si todavía no se finaliza)
+    @Column(name = "fecha_finalizacion")
+    private LocalDateTime fechaFinalizacion;
+
     // Relación: muchos registros pertenecen a un usuario
     @NotNull(message = "El usuario es obligatorio")
     @ManyToOne
@@ -43,6 +51,21 @@ public class Registro {
     @ManyToOne
     @JoinColumn(name = "id_reto", nullable = false)
     private Reto reto;
+
+    // Quién aceptó (null si todavía no se acepta)
+    @ManyToOne
+    @JoinColumn(name = "aceptado_por", referencedColumnName = "id")
+    private Usuario aceptadoPor;
+
+    // Quién finalizó (null si todavía no se finaliza)
+    @ManyToOne
+    @JoinColumn(name = "finalizado_por", referencedColumnName = "id")
+    private Usuario finalizadoPor;
+
+    // Recibido al aceptar/finalizar: quién hace la acción. No se guarda tal cual,
+    // el service lo copia a aceptadoPor o finalizadoPor según el nuevo estado.
+    @Transient
+    private Usuario gestionadoPor;
 
 
     public Registro() {
@@ -103,6 +126,46 @@ public class Registro {
 
     public void setReto(Reto reto) {
         this.reto = reto;
+    }
+
+    public LocalDateTime getFechaAceptacion() {
+        return fechaAceptacion;
+    }
+
+    public void setFechaAceptacion(LocalDateTime fechaAceptacion) {
+        this.fechaAceptacion = fechaAceptacion;
+    }
+
+    public LocalDateTime getFechaFinalizacion() {
+        return fechaFinalizacion;
+    }
+
+    public void setFechaFinalizacion(LocalDateTime fechaFinalizacion) {
+        this.fechaFinalizacion = fechaFinalizacion;
+    }
+
+    public Usuario getAceptadoPor() {
+        return aceptadoPor;
+    }
+
+    public void setAceptadoPor(Usuario aceptadoPor) {
+        this.aceptadoPor = aceptadoPor;
+    }
+
+    public Usuario getFinalizadoPor() {
+        return finalizadoPor;
+    }
+
+    public void setFinalizadoPor(Usuario finalizadoPor) {
+        this.finalizadoPor = finalizadoPor;
+    }
+
+    public Usuario getGestionadoPor() {
+        return gestionadoPor;
+    }
+
+    public void setGestionadoPor(Usuario gestionadoPor) {
+        this.gestionadoPor = gestionadoPor;
     }
 }
 

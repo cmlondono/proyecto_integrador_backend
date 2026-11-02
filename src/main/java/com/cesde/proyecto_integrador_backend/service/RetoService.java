@@ -39,7 +39,11 @@ public class RetoService {
         return "Se ha borrado con exito";
     }
 
-    public List<Reto> listarRetos (){
+    // empresaId: si viene, solo trae los retos de esa empresa (cuentas tipo EMPRESA)
+    public List<Reto> listarRetos (UUID empresaId){
+        if (empresaId != null) {
+            return retoRepository.findByEmpresaId(empresaId);
+        }
         return retoRepository.findAll();
     }
 

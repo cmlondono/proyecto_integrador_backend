@@ -11,4 +11,5 @@ public interface RegistroRepository extends JpaRepository<Registro, UUID> {
 
     boolean existsByUsuarioIdAndRetoId(UUID usuarioId, UUID retoId);
     boolean existsByRetoId(UUID retoId);
+    boolean existsByUsuarioId(UUID usuarioId);
 }
