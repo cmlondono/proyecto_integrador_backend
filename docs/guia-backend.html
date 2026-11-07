@@ -1,0 +1,1143 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Guía Backend CESDE Retos</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: riel de índice fijo a la izquierda + secciones tipo diapositiva; paleta CESDE del front (magenta sobre neutros verdosos) */
+:root{
+  --bg:#f1f4f2; --surface:#ffffff; --surface-2:#f7f9f8; --ink:#15151b; --muted:#5a635d; --line:#e1e6e3; --line-2:#d3d9d5;
+  --accent:#c41f63; --accent-deep:#a3195a; --accent-soft:#fce4ee; --accent-ink:#ffffff;
+  --hero:#15151b; --hero-ink:#f4f6f5; --hero-muted:#a7b0aa; --hero-line:#2c2f33;
+  --get:#05603a; --get-bg:#dcfae6; --post:#a3195a; --post-bg:#fce4ee; --put:#93370d; --put-bg:#fef0c7; --del:#b42318; --del-bg:#fee4e2;
+  --code-bg:#15151b; --code-ink:#e8ebe9; --code-muted:#8b948e; --code-key:#f48fb8; --code-str:#9fe3b9; --code-num:#ffd38a;
+  --f-display:"Bricolage Grotesque", "Plus Jakarta Sans", system-ui, sans-serif;
+  --f-body:"Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --r:14px; --r-sm:9px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1112; --surface:#181b1c; --surface-2:#1d2122; --ink:#eef1ef; --muted:#9aa49e; --line:#272c2b; --line-2:#333a38;
+  --accent:#f0639c; --accent-deep:#f0639c; --accent-soft:#3a1527; --accent-ink:#15151b;
+  --hero:#0a0b0c; --hero-ink:#f4f6f5; --hero-muted:#98a19b; --hero-line:#24282a;
+  --get:#7ee2a8; --get-bg:#0f2e1e; --post:#f597bd; --post-bg:#3a1527; --put:#fbc56b; --put-bg:#352510; --del:#fb8f86; --del-bg:#3b1513;
+  --code-bg:#0b0c0d; color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#0f1112; --surface:#181b1c; --surface-2:#1d2122; --ink:#eef1ef; --muted:#9aa49e; --line:#272c2b; --line-2:#333a38;
+  --accent:#f0639c; --accent-deep:#f0639c; --accent-soft:#3a1527; --accent-ink:#15151b;
+  --hero:#0a0b0c; --hero-ink:#f4f6f5; --hero-muted:#98a19b; --hero-line:#24282a;
+  --get:#7ee2a8; --get-bg:#0f2e1e; --post:#f597bd; --post-bg:#3a1527; --put:#fbc56b; --put-bg:#352510; --del:#fb8f86; --del-bg:#3b1513;
+  --code-bg:#0b0c0d; color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0}[hidden]{display:none!important}img{max-width:100%}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}*{transition:none!important;animation:none!important}}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15.5px;line-height:1.6;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;letter-spacing:-.02em}
+p{margin:0}
+code,.mono{font-family:var(--f-mono);font-size:.86em}
+:not(pre)>code{background:var(--surface-2);border:1px solid var(--line);padding:.08em .4em;border-radius:6px;white-space:nowrap}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+
+/* ---------- Estructura ---------- */
+.shell{display:grid;grid-template-columns:250px minmax(0,1fr);min-height:100vh}
+.rail{position:sticky;top:0;height:100vh;padding:28px 18px 24px;border-right:1px solid var(--line);display:flex;flex-direction:column;gap:22px;background:var(--bg);padding-left:max(18px, env(safe-area-inset-left, 0px))}
+.brand{display:flex;flex-direction:column;gap:2px}
+.brand b{font-family:var(--f-display);font-size:19px;letter-spacing:-.02em}
+.brand span{font-size:12px;color:var(--muted)}
+.brand .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-right:7px;vertical-align:1px}
+.toc{display:flex;flex-direction:column;gap:1px;overflow:auto;margin:0 -6px;padding:0 6px}
+.toc a{display:grid;grid-template-columns:26px 1fr;align-items:baseline;padding:7px 10px;border-radius:9px;color:var(--muted);text-decoration:none;font-size:13.5px;font-weight:500;transition:background .15s,color .15s}
+.toc a .n{font-family:var(--f-mono);font-size:11px;opacity:.7}
+.toc a:hover{background:var(--surface);color:var(--ink)}
+.toc a.on{background:var(--surface);color:var(--ink);box-shadow:inset 2px 0 0 var(--accent)}
+.toc a.on .n{color:var(--accent);opacity:1}
+.rail-foot{margin-top:auto;font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:8px}
+.kbd{font-family:var(--f-mono);font-size:11px;border:1px solid var(--line-2);border-bottom-width:2px;border-radius:5px;padding:0 5px;background:var(--surface)}
+.theme-btn{align-self:flex-start;border:1px solid var(--line-2);background:var(--surface);border-radius:999px;padding:5px 12px;font-size:12px;font-weight:600}
+
+main{min-width:0}
+.sec{padding-block:88px;padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));border-bottom:1px solid var(--line);scroll-margin-top:0}
+.wrap{max-width:1040px;margin:0 auto;display:flex;flex-direction:column;gap:30px}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:600}
+.sec h2{font-size:clamp(28px,3.4vw,40px);line-height:1.1;font-weight:800}
+.lede{color:var(--muted);max-width:64ch;font-size:16.5px}
+.head{display:flex;flex-direction:column;gap:12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
+.muted{color:var(--muted)}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:3px 10px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line);white-space:nowrap}
+.m{font-family:var(--f-mono);font-size:11px;font-weight:600;letter-spacing:.02em;padding:2px 7px;border-radius:6px;display:inline-block;min-width:54px;text-align:center}
+.m.GET{color:var(--get);background:var(--get-bg)} .m.POST{color:var(--post);background:var(--post-bg)}
+.m.PUT{color:var(--put);background:var(--put-bg)} .m.DELETE{color:var(--del);background:var(--del-bg)}
+pre.code{margin:0;background:var(--code-bg);color:var(--code-ink);border-radius:var(--r-sm);padding:16px 18px;font-family:var(--f-mono);font-size:12.8px;line-height:1.65;overflow-x:auto;white-space:pre}
+pre.code .c{color:var(--code-muted)} pre.code .k{color:var(--code-key)} pre.code .s{color:var(--code-str)} pre.code .n{color:var(--code-num)}
+.seg{display:inline-flex;flex-wrap:wrap;gap:4px;padding:4px;background:var(--surface);border:1px solid var(--line);border-radius:12px}
+.seg button{border:0;background:transparent;padding:8px 14px;border-radius:9px;font-size:13.5px;font-weight:600;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.btn{border:1px solid var(--line-2);background:var(--surface);border-radius:10px;padding:9px 16px;font-size:13.5px;font-weight:600;display:inline-flex;align-items:center;gap:8px}
+.btn:hover{border-color:var(--ink)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.primary:hover{filter:brightness(1.07)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.note{display:flex;gap:14px;padding:16px 18px;border-radius:var(--r);background:var(--accent-soft);border:1px solid color-mix(in srgb,var(--accent) 22%,transparent)}
+.note b{font-weight:700}
+.note .ic{flex:none;width:28px;height:28px;border-radius:8px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:800;font-family:var(--f-display)}
+table.t{width:100%;border-collapse:collapse;font-size:14px}
+.t th{font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-align:left;font-weight:600;padding:12px 16px;border-bottom:1px solid var(--line)}
+.t td{padding:13px 16px;border-bottom:1px solid var(--line);vertical-align:top}
+.t tr:last-child td{border-bottom:0}
+.tscroll{overflow-x:auto}
+
+/* ---------- Hero ---------- */
+.hero{background:var(--hero);color:var(--hero-ink);padding-block:84px 72px;padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;inset:auto -10% -60% 40%;height:120%;background:radial-gradient(closest-side,color-mix(in srgb,#db2771 26%,transparent),transparent);pointer-events:none}
+.hero .wrap{position:relative;z-index:1;gap:34px}
+.hero .eyebrow{color:#f48fb8}
+.hero h1{font-size:clamp(40px,6.4vw,78px);line-height:.98;font-weight:800;letter-spacing:-.035em;max-width:14ch}
+.hero h1 em{font-style:normal;color:#f48fb8}
+.hero .lede{color:var(--hero-muted);font-size:18px;max-width:58ch}
+.thesis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--hero-line);border:1px solid var(--hero-line);border-radius:var(--r);overflow:hidden}
+.thesis div{background:var(--hero);padding:18px 20px;display:flex;flex-direction:column;gap:6px}
+.thesis .who{font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;color:#f48fb8;font-weight:600}
+.thesis p{font-size:15px;color:var(--hero-ink)}
+.stats{display:flex;flex-wrap:wrap;gap:34px;border-top:1px solid var(--hero-line);padding-top:26px}
+.stat b{display:block;font-family:var(--f-display);font-size:40px;line-height:1;font-weight:700;font-variant-numeric:tabular-nums}
+.stat span{font-size:12.5px;color:var(--hero-muted)}
+.team-line{font-size:13.5px;color:var(--hero-muted)}
+.team-line b{color:var(--hero-ink);font-weight:600}
+
+/* ---------- Tres piezas ---------- */
+.pieces{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:stretch;gap:0}
+.piece{padding:22px;display:flex;flex-direction:column;gap:10px}
+.piece .tag{font-family:var(--f-mono);font-size:11px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.piece h3{font-size:22px}
+.piece ul{margin:0;padding-left:18px;color:var(--muted);font-size:14px;display:flex;flex-direction:column;gap:3px}
+.piece .port{margin-top:auto;font-family:var(--f-mono);font-size:12.5px;color:var(--ink);background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:6px 10px;align-self:flex-start}
+.piece.mid{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.link{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:0 10px;min-width:96px}
+.link .lbl{font-family:var(--f-mono);font-size:11px;color:var(--muted);text-align:center;line-height:1.3}
+.link .arr{width:100%;height:2px;background:repeating-linear-gradient(90deg,var(--line-2) 0 6px,transparent 6px 10px);position:relative;background-size:10px 2px;animation:flow 0.8s linear infinite}
+.link .arr::after{content:"";position:absolute;right:-2px;top:-4px;border:5px solid transparent;border-left-color:var(--line-2);border-right:0}
+@keyframes flow{to{background-position:10px 0}}
+
+/* ---------- Recorrido ---------- */
+.trip{padding:22px;display:flex;flex-direction:column;gap:22px}
+.lane{position:relative;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;padding:28px 0 10px}
+.lane::before{content:"";position:absolute;left:10%;right:10%;top:62px;height:2px;background:var(--line)}
+.node{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center}
+.node .disc{width:68px;height:68px;border-radius:18px;background:var(--surface);border:1.5px solid var(--line-2);display:grid;place-items:center;transition:all .3s}
+.node .disc svg{width:28px;height:28px;stroke:var(--muted);fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;transition:stroke .3s}
+.node b{font-size:13.5px}
+.node small{font-family:var(--f-mono);font-size:11px;color:var(--muted);line-height:1.3}
+.node.on .disc{border-color:var(--accent);background:var(--accent-soft);transform:translateY(-3px);box-shadow:0 10px 24px -12px var(--accent)}
+.node.on .disc svg{stroke:var(--accent)}
+.node.done .disc{border-color:var(--ink)}
+.node.done .disc svg{stroke:var(--ink)}
+.packet{position:absolute;z-index:2;top:52px;left:0;transform:translateX(-50%);transition:left .55s cubic-bezier(.6,.05,.3,1),background .3s;background:var(--accent);color:var(--accent-ink);font-family:var(--f-mono);font-size:11px;font-weight:600;padding:3px 9px;border-radius:999px;white-space:nowrap;pointer-events:none;box-shadow:0 6px 16px -8px var(--accent)}
+.packet.back{background:var(--get);color:var(--surface)}
+.packet.err{background:var(--del);color:var(--surface)}
+.stepbox{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:18px;align-items:start}
+.stepinfo{display:flex;flex-direction:column;gap:10px}
+.stepinfo .count{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.stepinfo h3{font-size:22px}
+.stepinfo p{color:var(--muted)}
+.where{font-family:var(--f-mono);font-size:12px;color:var(--ink);background:var(--surface-2);border:1px solid var(--line);padding:5px 10px;border-radius:8px;align-self:flex-start}
+.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.bar{flex:1;min-width:120px;height:4px;border-radius:4px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);width:0;transition:width .4s}
+
+/* ---------- Capas ---------- */
+.layers{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:18px}
+.stack{display:flex;flex-direction:column;gap:8px}
+.layer{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:14px 16px;text-align:left;display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;transition:border-color .2s,transform .2s}
+.layer .lv{font-family:var(--f-mono);font-size:11px;color:var(--muted);width:22px}
+.layer b{display:block;font-size:15px}
+.layer span{font-size:13px;color:var(--muted)}
+.layer .pkg{font-family:var(--f-mono);font-size:11.5px;color:var(--muted)}
+.layer[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);transform:translateX(4px)}
+.layer[aria-pressed="true"] .lv{color:var(--accent)}
+.down{align-self:center;color:var(--line-2);font-size:13px;line-height:1;margin:-3px 0}
+.ldetail{padding:20px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.ldetail h3{font-size:20px}
+.files{display:flex;flex-wrap:wrap;gap:6px}
+.files .chip{font-family:var(--f-mono);font-weight:500;font-size:11.5px}
+
+/* ---------- Endpoints ---------- */
+.api{display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);gap:18px;align-items:start}
+.eplist{display:flex;flex-direction:column;padding:8px}
+.ep{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:center;padding:11px 12px;border:0;background:transparent;border-radius:10px;text-align:left}
+.ep:hover{background:var(--surface-2)}
+.ep[aria-pressed="true"]{background:var(--surface-2);box-shadow:inset 0 0 0 1px var(--line-2)}
+.ep .path{font-family:var(--f-mono);font-size:12.5px;overflow-wrap:anywhere}
+.ep .d{grid-column:2;font-size:12.5px;color:var(--muted);margin-top:-6px}
+.epdetail{padding:20px;display:flex;flex-direction:column;gap:14px;min-width:0;position:sticky;top:20px}
+.epdetail .url{font-family:var(--f-mono);font-size:13px;overflow-wrap:anywhere;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.epdetail .url span{color:var(--muted)}
+.kv{display:grid;grid-template-columns:110px minmax(0,1fr);gap:8px 14px;font-size:13.5px}
+.kv dt{color:var(--muted);font-size:12.5px}
+.kv dd{margin:0}
+.lbl2{font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.copy{border:1px solid var(--line-2);background:var(--surface);border-radius:7px;padding:3px 9px;font-size:11px;font-family:var(--f-mono);text-transform:none;letter-spacing:0}
+
+/* ---------- Datos ---------- */
+.erwrap{padding:14px;overflow-x:auto}
+.er{display:block;width:100%;min-width:760px;height:auto}
+.er .box rect.bg{fill:var(--surface);stroke:var(--line-2);stroke-width:1.2;transition:stroke .2s}
+.er .box rect.hd{fill:var(--surface-2)}
+.er .box text{fill:var(--ink);font-family:var(--f-mono);font-size:12px}
+.er .box text.tt{font-family:var(--f-display);font-size:15px;font-weight:700}
+.er .box text.ty{fill:var(--muted);font-size:11px}
+.er .box text.pk{fill:var(--accent)}
+.er .box text.fk{fill:var(--put)}
+.er .box{cursor:pointer;transition:opacity .25s}
+.er .box:hover rect.bg{stroke:var(--ink)}
+.er .rel path{fill:none;stroke:var(--line-2);stroke-width:1.6;transition:stroke .25s,opacity .25s}
+.er .rel path.opt{stroke-dasharray:5 4}
+.er .rel text{fill:var(--muted);font-family:var(--f-mono);font-size:11px;transition:opacity .25s}
+.er .rel text.card{fill:var(--ink);font-weight:600}
+.er .rel rect{fill:var(--surface)}
+.er.focus .box{opacity:.28}
+.er.focus .box.hl{opacity:1}
+.er.focus .box.hl.main rect.bg{stroke:var(--accent);stroke-width:2}
+.er.focus .rel{opacity:.15}
+.er.focus .rel.hl{opacity:1}
+.er.focus .rel.hl path{stroke:var(--accent)}
+.erside{display:flex;flex-direction:column;gap:10px;padding:18px 20px}
+.erside h3{font-size:19px}
+
+/* ---------- Roles ---------- */
+.roles{display:grid;grid-template-columns:240px minmax(0,1fr);gap:18px}
+.mock{background:#15151b;color:#e9ecea;border-radius:var(--r);padding:18px 14px;display:flex;flex-direction:column;gap:4px;min-height:300px}
+.mock .mh{font-family:var(--f-display);font-weight:700;padding:0 8px 12px;border-bottom:1px solid #2c2f33;margin-bottom:8px;font-size:15px}
+.mock .mh small{display:block;font-family:var(--f-body);font-weight:500;color:#98a19b;font-size:12px}
+.mock .mi{padding:8px 10px;border-radius:8px;font-size:13.5px;display:flex;justify-content:space-between;transition:opacity .25s}
+.mock .mi.on{background:#2a2d31}
+.mock .mi.off{opacity:.25;text-decoration:line-through}
+.rolecard{padding:22px;display:flex;flex-direction:column;gap:14px}
+.rolecard h3{font-size:24px}
+.can{display:flex;flex-direction:column;gap:8px;margin:0;padding:0;list-style:none}
+.can li{display:grid;grid-template-columns:18px 1fr;gap:10px;font-size:14.5px}
+.can li::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--accent);margin-top:8px}
+.eps{display:flex;flex-wrap:wrap;gap:6px}
+.eps .chip{font-family:var(--f-mono);font-weight:500;font-size:11.5px}
+
+/* ---------- Postulación ---------- */
+.flow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:start}
+.states{padding:22px;display:flex;flex-direction:column;gap:20px}
+.track{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:6px}
+.st{border:1.5px solid var(--line-2);border-radius:12px;padding:12px 8px;text-align:center;display:flex;flex-direction:column;gap:2px;transition:all .3s;background:var(--surface)}
+.st b{font-family:var(--f-mono);font-size:12px;letter-spacing:.02em}
+.st small{font-size:11.5px;color:var(--muted)}
+.st.now{border-color:var(--accent);background:var(--accent-soft);box-shadow:0 8px 20px -14px var(--accent)}
+.st.past{border-color:var(--ink)}
+.st.gone{opacity:.35}
+.tarrow{color:var(--muted);font-family:var(--f-mono);font-size:11px;text-align:center;line-height:1.2}
+.log{font-size:13.5px;min-height:48px;padding:12px 14px;border-radius:10px;background:var(--surface-2);border:1px solid var(--line)}
+.log.err{background:var(--del-bg);border-color:color-mix(in srgb,var(--del) 35%,transparent);color:var(--del)}
+.log.ok{background:var(--get-bg);border-color:color-mix(in srgb,var(--get) 30%,transparent);color:var(--get)}
+
+/* ---------- Seguridad ---------- */
+.hash{display:flex;flex-wrap:wrap;gap:6px;font-family:var(--f-mono);font-size:14px}
+.hash span{padding:6px 10px;border-radius:8px;border:1.5px solid;cursor:default;overflow-wrap:anywhere}
+.hash .h1{border-color:#e59b2c;background:color-mix(in srgb,#e59b2c 12%,transparent)}
+.hash .h2{border-color:#d9443a;background:color-mix(in srgb,#d9443a 12%,transparent)}
+.hash .h3{border-color:#3b6fd9;background:color-mix(in srgb,#3b6fd9 12%,transparent)}
+.hash .h4{border-color:#2f9a5c;background:color-mix(in srgb,#2f9a5c 12%,transparent)}
+.legend{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;font-size:12.5px;color:var(--muted)}
+.legend b{display:block;color:var(--ink);font-size:13px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.lab{padding:20px;display:flex;flex-direction:column;gap:14px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:12.5px;font-weight:600;color:var(--muted)}
+.field input{font:inherit;font-family:var(--f-mono);font-size:14px;padding:10px 12px;border-radius:10px;border:1px solid var(--line-2);background:var(--surface-2);color:var(--ink);width:100%}
+.field input:focus{outline:2px solid var(--accent);outline-offset:0}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.login{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.lstep{padding:16px;display:flex;flex-direction:column;gap:6px}
+.lstep .who{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.08em;font-weight:600;color:var(--accent)}
+.lstep b{font-size:14.5px}
+.lstep p{font-size:13px;color:var(--muted)}
+
+/* ---------- Respuestas ---------- */
+.code-pill{font-family:var(--f-mono);font-weight:600;font-size:12.5px;padding:3px 9px;border-radius:7px;display:inline-block}
+.c2{color:var(--get);background:var(--get-bg)} .c4{color:var(--put);background:var(--put-bg)} .c409{color:var(--post);background:var(--post-bg)} .c5{color:var(--del);background:var(--del-bg)}
+
+/* ---------- Ejecutar ---------- */
+.run{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.runstep{padding:20px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.runstep .num{font-family:var(--f-display);font-size:34px;font-weight:800;color:var(--accent);line-height:1}
+.runstep h3{font-size:18px}
+.runstep p{font-size:13.5px;color:var(--muted)}
+.cmd{display:flex;align-items:center;gap:8px;background:var(--code-bg);color:var(--code-ink);border-radius:9px;padding:9px 10px 9px 14px;font-family:var(--f-mono);font-size:12.5px;min-width:0}
+.cmd code{background:none;border:0;padding:0;color:inherit;white-space:pre;overflow-x:auto;flex:1;min-width:0;font-size:12.5px}
+.cmd button{flex:none;border:1px solid #3a3e42;background:transparent;color:#c9cfcb;border-radius:6px;padding:2px 8px;font-size:11px;font-family:var(--f-mono)}
+
+/* ---------- Equipo ---------- */
+.team{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.member{padding:22px;display:flex;flex-direction:column;gap:14px}
+.av{width:52px;height:52px;border-radius:14px;display:grid;place-items:center;font-family:var(--f-display);font-weight:800;font-size:18px;background:var(--accent-soft);color:var(--accent-deep)}
+.member b{font-size:16px;line-height:1.3}
+.member span{font-size:12.5px;color:var(--muted)}
+.closing{font-family:var(--f-display);font-size:clamp(22px,2.6vw,30px);font-weight:700;letter-spacing:-.02em;max-width:30ch;line-height:1.2}
+
+/* ---------- Control flotante ---------- */
+.pager{position:fixed;right:max(18px, calc(env(safe-area-inset-right, 0px) + 12px));bottom:calc(18px + env(safe-area-inset-bottom, 0px));z-index:20;display:flex;align-items:center;gap:4px;background:var(--surface);border:1px solid var(--line-2);border-radius:999px;padding:4px;box-shadow:0 12px 30px -16px rgba(0,0,0,.35)}
+.pager button{border:0;background:transparent;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-size:16px}
+.pager button:hover{background:var(--surface-2)}
+.pager .pc{font-family:var(--f-mono);font-size:12px;padding:0 6px;font-variant-numeric:tabular-nums;color:var(--muted)}
+.pager .pc b{color:var(--ink)}
+
+/* ---------- Responsive ---------- */
+@media (max-width:980px){
+  .shell{grid-template-columns:1fr}
+  .rail{display:none}
+  .layers,.api,.flow,.stepbox,.roles{grid-template-columns:1fr}
+  .epdetail{position:static}
+  .team,.grid4,.login{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .run{grid-template-columns:1fr}
+}
+@media (max-width:760px){
+  .sec{padding-block:64px}
+  .pieces{grid-template-columns:1fr}
+  .link{flex-direction:row;min-width:0;padding:10px 0}
+  .link .arr{width:2px;height:28px;background:var(--line-2);animation:none}
+  .link .arr::after{right:-4px;top:auto;bottom:-3px;border:5px solid transparent;border-top-color:var(--line-2);border-bottom:0}
+  .thesis,.grid3,.grid2{grid-template-columns:1fr}
+  .lane{grid-template-columns:1fr;gap:16px;padding:6px 0}
+  .lane::before{display:none}
+  .node{flex-direction:row;text-align:left}
+  .node .disc{width:48px;height:48px;border-radius:13px;flex:none}
+  .node .disc svg{width:22px;height:22px}
+  .node .txt{display:flex;flex-direction:column}
+  .packet{display:none}
+  .legend{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .track{grid-template-columns:1fr}
+  .tarrow{transform:rotate(90deg)}
+}
+@media (max-width:520px){
+  .team,.grid4,.login{grid-template-columns:1fr}
+  .kv{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <aside class="rail" aria-label="Índice">
+    <div class="brand"><b><span class="dot"></span>CESDE Retos</b><span>Proyecto Integrador · Backend</span></div>
+    <nav class="toc" id="toc"></nav>
+    <div class="rail-foot">
+      <div>Navega con <span class="kbd">←</span> <span class="kbd">→</span></div>
+      <button class="theme-btn" id="themeBtn" type="button">Cambiar tema</button>
+    </div>
+  </aside>
+
+  <main id="main">
+    <!-- 01 -->
+    <header class="hero sec" id="vision" data-title="Visión">
+      <div class="wrap">
+        <div class="eyebrow">Proyecto Integrador · CESDE · Guía del backend</div>
+        <h1>Retos reales para <em>estudiantes reales</em>.</h1>
+        <p class="lede">Una API REST en Spring Boot que conecta a las empresas con los estudiantes de CESDE. Las empresas publican retos, los estudiantes se postulan y CESDE administra todo el proceso. Esta guía muestra cómo funciona por dentro y cómo se conecta con el front en React.</p>
+        <div class="thesis">
+          <div><span class="who">EMPRESA</span><p>Publica retos de su área y sigue a los estudiantes que se postulan.</p></div>
+          <div><span class="who">ESTUDIANTE</span><p>Explora los retos publicados, se postula y ve el estado de cada postulación.</p></div>
+          <div><span class="who">CESDE</span><p>Administra empresas, usuarios y categorías. Acepta y finaliza postulaciones.</p></div>
+        </div>
+        <div class="stats">
+          <div class="stat"><b>3</b><span>roles</span></div>
+          <div class="stat"><b>5</b><span>recursos REST</span></div>
+          <div class="stat"><b>24</b><span>endpoints</span></div>
+          <div class="stat"><b>5</b><span>tablas en MySQL</span></div>
+          <div class="stat"><b>3</b><span>estados de postulación</span></div>
+        </div>
+        <p class="team-line">Equipo: <b>Jonathan Jurado Pineda</b> · <b>Juan Fernando Vásquez Usma</b> · <b>Brahian Pérez</b> · <b>Carlos Mario Vargas</b></p>
+      </div>
+    </header>
+
+    <!-- 02 -->
+    <section class="sec" id="piezas" data-title="Las tres piezas">
+      <div class="wrap">
+        <div class="head">
+          <div class="eyebrow">Arquitectura general</div>
+          <h2>Tres piezas que hablan entre sí</h2>
+          <p class="lede">El front nunca toca la base de datos. Le pide todo al backend en JSON, y el backend es el único que lee y escribe en MySQL. Así las reglas del negocio viven en un solo lugar.</p>
+        </div>
+        <div class="pieces">
+          <div class="card piece">
+            <span class="tag">Frontend</span>
+            <h3>proyecto_integrador_front</h3>
+            <ul><li>React 19 + Vite</li><li>Un <code>service</code> por recurso</li><li><code>pedir()</code> en <code>core/lib/api.js</code></li></ul>
+            <span class="port">localhost:5173</span>
+          </div>
+          <div class="link"><span class="lbl">JSON<br>fetch</span><span class="arr"></span></div>
+          <div class="card piece mid">
+            <span class="tag">Backend · esta guía</span>
+            <h3>API REST</h3>
+            <ul><li>Java 17 · Spring Boot 4.1</li><li>Spring Web MVC + Data JPA</li><li>Validation · BCrypt</li></ul>
+            <span class="port">localhost:8080/api/v1</span>
+          </div>
+          <div class="link"><span class="lbl">SQL<br>JPA · Hibernate</span><span class="arr"></span></div>
+          <div class="card piece">
+            <span class="tag">Base de datos</span>
+            <h3>MySQL</h3>
+            <ul><li>Base <code>proyecto_integrador</code></li><li>Tablas creadas por Hibernate</li><li><code>ddl-auto=update</code></li></ul>
+            <span class="port">localhost:3307</span>
+          </div>
+        </div>
+        <div class="note"><span class="ic">i</span><p><b>CORS.</b> Cada controlador lleva <code>@CrossOrigin(origins = "http://localhost:5173")</code>. Por eso el navegador deja que el front de Vite llame a la API aunque estén en puertos distintos.</p></div>
+      </div>
+    </section>
+
+    <!-- 03 -->
+    <section class="sec" id="recorrido" data-title="Recorrido de una petición">
+      <div class="wrap">
+        <div class="head">
+          <div class="eyebrow">Paso a paso</div>
+          <h2>El viaje de una petición</h2>
+          <p class="lede">Elige un caso y avanza con <b>Siguiente</b> (o con la flecha <span class="kbd">→</span>). La etiqueta muestra lo que viaja en cada momento: la petición de ida y la respuesta de vuelta.</p>
+        </div>
+        <div class="seg" id="scenarios" role="group" aria-label="Casos"></div>
+        <div class="card trip">
+          <div class="lane" id="lane">
+            <div class="packet" id="packet">POST</div>
+          </div>
+          <div class="stepbox">
+            <div class="stepinfo">
+              <span class="count" id="stepCount">Paso 1 de 7</span>
+              <h3 id="stepTitle"></h3>
+              <p id="stepText"></p>
+              <span class="where" id="stepWhere"></span>
+            </div>
+            <pre class="code" id="stepCode"></pre>
+          </div>
+          <div class="controls">
+            <button class="btn" id="prevStep" type="button">← Anterior</button>
+            <button class="btn primary" id="nextStep" type="button">Siguiente →</button>
+            <button class="btn" id="playStep" type="button">▶ Reproducir</button>
+            <div class="bar"><i id="stepBar"></i></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 04 -->
+    <section class="sec" id="capas" data-title="Capas del backend">
+      <div class="wrap">
+        <div class="head">
+          <div class="eyebrow">Organización del código</div>
+          <h2>Cuatro capas, una responsabilidad cada una</h2>
+          <p class="lede">El paquete <code>com.cesde.proyecto_integrador_backend</code> está dividido por capas. Cada petición baja por ellas en orden y cada una hace una sola cosa. Toca una capa para ver qué hace y un fragmento real del código.</p>
+        </div>
+        <div class="layers">
+          <div class="stack" id="stack"></div>
+          <div class="card ldetail" id="ldetail"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 05 -->
+    <section class="sec" id="endpoints" data-title="Endpoints">
+      <div class="wrap">
+        <div class="head">
+          <div class="eyebrow">Contrato de la API</div>
+          <h2>24 endpoints bajo <span class="mono" style="font-size:.8em">/api/v1</span></h2>
+          <p class="lede">Cada recurso tiene su controlador. Elige un recurso y un endpoint para ver qué recibe, qué devuelve y qué función del front lo llama.</p>
+        </div>
+        <div class="seg" id="resources" role="group" aria-label="Recursos"></div>
+        <div class="api">
+          <div class="card eplist" id="eplist"></div>
+          <div class="card epdetail" id="epdetail"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 06 -->
+    <section class="sec" id="datos" data-title="Modelo de datos">
+      <div class="wrap">
+        <div class="head">
+          <div class="eyebrow">Base de datos</div>
+          <h2>Cinco tablas y cómo se relacionan</h2>
+          <p class="lede">Las tablas salen de las clases en <code>model/</code>: Hibernate las crea solas al arrancar. Todos los <code>id</code> son UUID. Toca una tabla para resaltar sus relaciones.</p>
+        </div>
+        <div class="card erwrap"><svg class="er" id="er" viewBox="0 0 880 600" role="img" aria-label="Diagrama entidad relación"></svg></div>
+        <div class="card erside" id="erside"></div>
+        <div class="card tscroll">
+          <table class="t">
+            <thead><tr><th>Regla</th><th>Dónde se garantiza</th></tr></thead>
+            <tbody>
+              <tr><td>Un correo de usuario no se repite</td><td><code>@Column(unique = true)</code> en <code>Usuario.correo</code> y <code>existsByCorreo</code> en <code>UsuarioService</code></td></tr>
+              <tr><td>Un estudiante no se postula dos veces al mismo reto</td><td><code>@UniqueConstraint(id_usuario, id_reto)</code> en <code>REGISTRO</code> y <code>existsByUsuarioIdAndRetoId</code></td></tr>
+              <tr><td>Una cuenta EMPRESA siempre pertenece a una empresa</td><td>Validación en <code>UsuarioService.registrar()</code></td></tr>
+              <tr><td>La contraseña tiene mínimo 6 caracteres</td><td><code>@Size(min = 6)</code> en <code>Usuario.contrasena</code></td></tr>
+              <tr><td>El teléfono de la empresa tiene entre 7 y 15 caracteres</td><td><code>@Size(min = 7, max = 15)</code> en <code>Empresa.telefono</code></td></tr>
+              <tr><td>El nombre de la categoría es único</td><td><code>@Column(unique = true)</code> en <code>Categoria.nombre</code></td></tr>
+              <tr><td>Un reto siempre tiene empresa y categoría</td><td><code>@NotNull</code> en <code>Reto.empresa</code> y <code>Reto.categoria</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 07 -->
+    <section class="sec" id="roles" data-title="Roles">
+      <div class="wrap">
+        <div class="head">
+          <div class="eyebrow">Quién hace qué</div>
+          <h2>Tres roles, tres experiencias</h2>
+          <p class="lede">El rol viene del enum <code>ROLES</code> del backend y el front usa los mismos valores en <code>auth/utils/roles.js</code>. Según el rol con el que entres, el front muestra un menú distinto y llama a endpoints distintos.</p>
+        </div>
+        <div class="seg" id="roleSeg" role="group" aria-label="Roles"></div>
+        <div class="roles">
+          <div class="mock" id="mock" aria-hidden="true"></div>
+          <div class="card rolecard" id="rolecard"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 08 -->
+    <section class="sec" id="postulacion" data-title="Ciclo de una postulación">
+      <div class="wrap">
+        <div class="head">
+          <div class="eyebrow">Regla de negocio central</div>
+          <h2>La vida de una postulación</h2>
+          <p class="lede">Cada postulación es una fila en <code>REGISTRO</code>. Avanza por tres estados y guarda quién la movió y cuándo. Pruébalo: acepta, finaliza o intenta cancelar y mira cómo cambia el JSON.</p>
+        </div>
+        <div class="flow">
+          <div class="card states">
+            <div class="track">
+              <div class="st" id="sINSCRITO"><b>INSCRITO</b><small>el estudiante se postuló</small></div>
+              <div class="tarrow">aceptar<br>→</div>
+              <div class="st" id="sEN_PROCESO"><b>EN_PROCESO</b><small>CESDE o la empresa aceptó</small></div>
+              <div class="tarrow">finalizar<br>→</div>
+              <div class="st" id="sFINALIZADO"><b>FINALIZADO</b><small>el reto terminó</small></div>
+            </div>
+            <div class="row">
+              <button class="btn primary" id="bAceptar" type="button">Aceptar</button>
+              <button class="btn primary" id="bFinalizar" type="button">Finalizar</button>
+              <button class="btn" id="bCancelar" type="button">Cancelar postulación</button>
+              <button class="btn" id="bReset" type="button">Reiniciar</button>
+            </div>
+            <div class="log" id="plog">Postulación creada con <code>POST /registro</code>. Estado inicial: INSCRITO.</div>
+            <p class="muted" style="font-size:13.5px">En <code>RegistroService.actualizarRegistro()</code> cada transición se guarda aparte: al pasar a EN_PROCESO se llenan <code>fechaAceptacion</code> y <code>aceptadoPor</code>; al pasar a FINALIZADO, <code>fechaFinalizacion</code> y <code>finalizadoPor</code>. El campo <code>gestionadoPor</code> es <code>@Transient</code>: llega en la petición pero no se guarda tal cual.</p>
+          </div>
+          <pre class="code" id="pjson"></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- 09 -->
+    <section class="sec" id="borrado" data-title="Borrado protegido">
+      <div class="wrap">
+        <div class="head">
+          <div class="eyebrow">Integridad de los datos</div>
+          <h2>Nada se borra si deja huérfanos</h2>
+          <p class="lede">No hay borrado en cascada. Antes de eliminar, cada servicio revisa si hay registros que dependen de lo que se quiere borrar. Si los hay, la operación se detiene y responde con un mensaje claro.</p>
+        </div>
+        <div class="card tscroll">
+          <table class="t">
+            <thead><tr><th>Al borrar…</th><th>Se revisa</th><th>Mensaje si no se puede</th></tr></thead>
+            <tbody>
+              <tr><td><b>Empresa</b></td><td><code>retoRepository.existsByEmpresaId</code><br><code>usuarioRepository.existsByEmpresaId</code></td><td>La empresa tiene retos asociados<br>La empresa tiene usuarios asociados</td></tr>
+              <tr><td><b>Categoría</b></td><td><code>retoRepository.existsByCategoriaId</code></td><td>La categoría tiene retos asociados</td></tr>
+              <tr><td><b>Reto</b></td><td><code>registroRepository.existsByRetoId</code></td><td>El reto tiene registros asociados</td></tr>
+              <tr><td><b>Usuario</b></td><td><code>registroRepository.existsByUsuarioId</code></td><td>El usuario tiene postulaciones asociadas</td></tr>
+              <tr><td><b>Postulación</b></td><td>Que el estado sea <code>INSCRITO</code></td><td>Solo se puede cancelar una postulación mientras está inscrita <span class="code-pill c409">409</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note"><span class="ic">i</span><p><b>Por qué importa.</b> Una postulación aceptada o finalizada es historial: dice quién trabajó en qué reto y quién lo aprobó. Por eso solo se puede cancelar mientras sigue en INSCRITO.</p></div>
+      </div>
+    </section>
+
+    <!-- 10 -->
+    <section class="sec" id="seguridad" data-title="Contraseñas y login">
+      <div class="wrap">
+        <div class="head">
+          <div class="eyebrow">Seguridad</div>
+          <h2>La contraseña nunca se guarda</h2>
+          <p class="lede">Se guarda un hash BCrypt: una huella de un solo sentido que no se puede revertir. El proyecto usa solo <code>spring-security-crypto</code>, sin activar Spring Security completo. Además, <code>@JsonProperty(access = WRITE_ONLY)</code> hace que la contraseña se pueda recibir pero nunca salga en una respuesta.</p>
+        </div>
+        <div class="card lab">
+          <div class="lbl2">Así se lee un hash guardado en la tabla USUARIO</div>
+          <div class="hash" id="hashView"></div>
+          <div class="legend">
+            <div><i style="background:#e59b2c"></i><b>Versión</b>algoritmo BCrypt</div>
+            <div><i style="background:#d9443a"></i><b>Costo</b>2¹⁰ = 1.024 rondas</div>
+            <div><i style="background:#3b6fd9"></i><b>Sal</b>22 caracteres aleatorios</div>
+            <div><i style="background:#2f9a5c"></i><b>Hash</b>31 caracteres</div>
+          </div>
+        </div>
+        <div class="card lab">
+          <div class="lbl2">Pruébalo en vivo</div>
+          <div class="grid2">
+            <div class="field"><label for="pw">Contraseña a cifrar</label><input id="pw" type="text" value="123456" autocomplete="off"></div>
+            <div class="field"><label for="pw2">Contraseña para comprobar (login)</label><input id="pw2" type="text" value="123456" autocomplete="off"></div>
+          </div>
+          <div class="row">
+            <button class="btn primary" id="bHash" type="button">Cifrar con encode()</button>
+            <button class="btn" id="bMatch" type="button">Comprobar con matches()</button>
+            <span class="muted" id="hashMsg" style="font-size:13.5px">Cifra dos veces la misma contraseña: el hash sale distinto porque la sal cambia.</span>
+          </div>
+        </div>
+        <div class="login">
+          <div class="card lstep"><span class="who">FRONT</span><b>LoginForm</b><p>Envía <code>{ correo, contrasena }</code> a <code>POST /usuario/login</code>.</p></div>
+          <div class="card lstep"><span class="who">BACKEND</span><b>Busca por correo</b><p><code>findByCorreo()</code>. Si no existe: «Correo o contraseña incorrectos».</p></div>
+          <div class="card lstep"><span class="who">BACKEND</span><b>Compara el hash</b><p><code>cifrador.matches()</code> saca la sal del hash guardado, recalcula y compara.</p></div>
+          <div class="card lstep"><span class="who">FRONT</span><b>Guarda la sesión</b><p>Recibe el usuario sin contraseña. Con «recordarme» va a <code>localStorage</code>; si no, a <code>sessionStorage</code>.</p></div>
+        </div>
+        <div class="note"><span class="ic">i</span><p><b>El mismo mensaje para los dos errores.</b> Si el correo no existe o la contraseña no coincide, la respuesta es igual. Así nadie puede averiguar qué correos están registrados.</p></div>
+      </div>
+    </section>
+
+    <!-- 11 -->
+    <section class="sec" id="respuestas" data-title="Respuestas HTTP">
+      <div class="wrap">
+        <div class="head">
+          <div class="eyebrow">Qué devuelve la API</div>
+          <h2>Códigos de respuesta</h2>
+          <p class="lede">El front lee cada respuesta con <code>pedir()</code>: si no es exitosa, toma el mensaje del cuerpo y lo muestra en pantalla. Algunos <code>DELETE</code> responden con texto plano en vez de JSON, y <code>pedir()</code> también los entiende.</p>
+        </div>
+        <div class="card tscroll">
+          <table class="t">
+            <thead><tr><th>Código</th><th>Cuándo ocurre</th><th>Ejemplo</th></tr></thead>
+            <tbody>
+              <tr><td><span class="code-pill c2">200</span></td><td>Todo salió bien</td><td>Listar retos, iniciar sesión, actualizar una empresa</td></tr>
+              <tr><td><span class="code-pill c2">201</span></td><td>Se creó un recurso</td><td><code>POST /reto</code> responde <code>ResponseEntity.status(CREATED)</code></td></tr>
+              <tr><td><span class="code-pill c4">400</span></td><td>Los datos no pasan <code>@Valid</code></td><td>Correo sin formato, contraseña de menos de 6 caracteres, campo obligatorio vacío</td></tr>
+              <tr><td><span class="code-pill c409">409</span></td><td>Conflicto con una regla del negocio</td><td>Postularse dos veces al mismo reto, cancelar una postulación que ya no está inscrita</td></tr>
+              <tr><td><span class="code-pill c5">500</span></td><td>Una regla lanzada como <code>RuntimeException</code></td><td>«Reto no encontrado», «La empresa tiene retos asociados», «Correo o contraseña incorrectos»</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note"><span class="ic">→</span><p><b>Siguiente mejora.</b> Un <code>@RestControllerAdvice</code> traduciría esas <code>RuntimeException</code> a 404, 401 o 409 según el caso, igual que ya se hace con <code>ResponseStatusException</code> en las postulaciones.</p></div>
+      </div>
+    </section>
+
+    <!-- 12 -->
+    <section class="sec" id="ejecutar" data-title="Cómo ejecutarlo">
+      <div class="wrap">
+        <div class="head">
+          <div class="eyebrow">Puesta en marcha</div>
+          <h2>Levantarlo en tres pasos</h2>
+          <p class="lede">El orden importa: primero la base de datos, luego el backend y al final el front.</p>
+        </div>
+        <div class="run">
+          <div class="card runstep">
+            <span class="num">1</span><h3>MySQL en el puerto 3307</h3>
+            <p>Crea la base vacía. Usuario <code>root</code> sin contraseña, como está en <code>application.properties</code>. Las tablas las crea Hibernate.</p>
+            <div class="cmd"><code>CREATE DATABASE proyecto_integrador;</code><button type="button" data-copy="CREATE DATABASE proyecto_integrador;">copiar</button></div>
+          </div>
+          <div class="card runstep">
+            <span class="num">2</span><h3>Backend en el puerto 8080</h3>
+            <p>Desde la carpeta <code>proyecto_integrador_backend</code>. Necesita Java 17.</p>
+            <div class="cmd"><code>./mvnw spring-boot:run</code><button type="button" data-copy="./mvnw spring-boot:run">copiar</button></div>
+          </div>
+          <div class="card runstep">
+            <span class="num">3</span><h3>Front en el puerto 5173</h3>
+            <p>Desde la carpeta <code>proyecto_integrador_front</code>. Abre <code>http://localhost:5173</code>.</p>
+            <div class="cmd"><code>npm install &amp;&amp; npm run dev</code><button type="button" data-copy="npm install && npm run dev">copiar</button></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 13 -->
+    <section class="sec" id="equipo" data-title="Equipo">
+      <div class="wrap">
+        <div class="head">
+          <div class="eyebrow">Proyecto Integrador · CESDE</div>
+          <h2>Equipo</h2>
+        </div>
+        <div class="team">
+          <div class="card member"><div class="av">JJ</div><div><b>Jonathan Jurado Pineda</b></div></div>
+          <div class="card member"><div class="av">JV</div><div><b>Juan Fernando Vásquez Usma</b></div></div>
+          <div class="card member"><div class="av">BP</div><div><b>Brahian Pérez</b></div></div>
+          <div class="card member"><div class="av">CV</div><div><b>Carlos Mario Vargas</b></div></div>
+        </div>
+        <p class="closing">Una empresa publica un reto, un estudiante lo resuelve y CESDE acompaña todo el proceso.</p>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="pager" aria-label="Navegación entre secciones">
+  <button type="button" id="pgPrev" aria-label="Sección anterior">↑</button>
+  <span class="pc" id="pgCount"><b>01</b> / 13</span>
+  <button type="button" id="pgNext" aria-label="Sección siguiente">↓</button>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bcryptjs/2.4.3/bcrypt.min.js"></script>
+<script>
+(function(){
+const $ = (s, r=document) => r.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* Resaltado simple para JSON y Java */
+function hl(src){
+  let s = esc(src);
+  s = s.replace(/(\/\/[^\n]*)/g,'<span class="c">$1</span>');
+  s = s.replace(/(&quot;[^&\n]*?&quot;)(\s*:)/g,'<span class="k">$1</span>$2');
+  s = s.replace(/(:\s*)(&quot;[^\n]*?&quot;)/g,'$1<span class="s">$2</span>');
+  s = s.replace(/\b(true|false|null)\b/g,'<span class="n">$1</span>');
+  s = s.replace(/(@\w+)/g,'<span class="k">$1</span>');
+  return s;
+}
+
+/* ---------- Tema ---------- */
+const root = document.documentElement;
+$('#themeBtn').addEventListener('click', () => {
+  const dark = root.dataset.theme ? root.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  root.dataset.theme = dark ? 'light' : 'dark';
+  try{ localStorage.setItem('tema', root.dataset.theme) }catch(e){}
+});
+try{ const t = localStorage.getItem('tema'); if(t) root.dataset.theme = t }catch(e){}
+
+/* ---------- Índice y navegación ---------- */
+const secs = [...document.querySelectorAll('.sec')];
+const toc = $('#toc');
+secs.forEach((s,i) => {
+  const a = document.createElement('a');
+  a.href = '#' + s.id;
+  a.innerHTML = `<span class="n">${String(i+1).padStart(2,'0')}</span><span>${s.dataset.title}</span>`;
+  toc.appendChild(a);
+});
+let current = 0;
+function setCurrent(i){
+  current = i;
+  [...toc.children].forEach((a,j) => a.classList.toggle('on', j===i));
+  $('#pgCount').innerHTML = `<b>${String(i+1).padStart(2,'0')}</b> / ${secs.length}`;
+}
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting) setCurrent(secs.indexOf(e.target)) });
+},{rootMargin:'-45% 0px -50% 0px'});
+secs.forEach(s => io.observe(s));
+function go(i){
+  i = Math.max(0, Math.min(secs.length-1, i));
+  secs[i].scrollIntoView({behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'});
+  setCurrent(i);
+}
+$('#pgPrev').onclick = () => go(current-1);
+$('#pgNext').onclick = () => go(current+1);
+document.addEventListener('keydown', e => {
+  if(e.target.closest('input,textarea') || e.metaKey || e.ctrlKey || e.altKey) return;
+  const inTrip = secs[current] && secs[current].id === 'recorrido';
+  if(e.key === 'ArrowRight' || e.key === 'PageDown'){
+    if(inTrip && e.key === 'ArrowRight' && step < SC[scen].steps.length-1){ e.preventDefault(); showStep(step+1); return; }
+    e.preventDefault(); go(current+1);
+  } else if(e.key === 'ArrowLeft' || e.key === 'PageUp'){
+    if(inTrip && e.key === 'ArrowLeft' && step > 0){ e.preventDefault(); showStep(step-1); return; }
+    e.preventDefault(); go(current-1);
+  }
+});
+
+/* ---------- Recorrido ---------- */
+const ICONS = {
+  front:'<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg>',
+  ctrl:'<svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h10M4 17h16"/><circle cx="18" cy="12" r="2"/></svg>',
+  svc:'<svg viewBox="0 0 24 24"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M12 12l8-4.5M12 12v9M12 12L4 7.5"/></svg>',
+  repo:'<svg viewBox="0 0 24 24"><path d="M5 4h11l3 3v13H5z"/><path d="M9 4v5h6V4M8 14h8M8 17h5"/></svg>',
+  db:'<svg viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v12c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12c0 1.7 3.1 3 7 3s7-1.3 7-3"/></svg>'
+};
+const NODES = [
+  {k:'front', t:'Front', s:'React · :5173'},
+  {k:'ctrl', t:'Controller', s:'@RestController'},
+  {k:'svc', t:'Service', s:'reglas de negocio'},
+  {k:'repo', t:'Repository', s:'JpaRepository'},
+  {k:'db', t:'MySQL', s:':3307'}
+];
+const lane = $('#lane');
+NODES.forEach(n => {
+  const d = document.createElement('div');
+  d.className = 'node'; d.dataset.k = n.k;
+  d.innerHTML = `<div class="disc">${ICONS[n.k]}</div><div class="txt"><b>${n.t}</b><small>${n.s}</small></div>`;
+  lane.appendChild(d);
+});
+const SC = {
+  login:{ name:'Iniciar sesión', steps:[
+    {at:0, tag:'POST /usuario/login', title:'El usuario escribe su correo y contraseña', text:'LoginForm llama a iniciarSesion() del authService, que usa pedir() para hacer el fetch con el cuerpo en JSON.', where:'front · auth/services/authService.js',
+     code:`export const iniciarSesion = (correo, contrasena) =>\n  pedir('/usuario/login', {\n    method: 'POST',\n    body: JSON.stringify({ correo, contrasena }),\n  })`},
+    {at:1, tag:'POST /usuario/login', title:'El controlador recibe la petición', text:'Spring convierte el JSON en un LoginRequest. @Valid revisa que el correo y la contraseña no lleguen vacíos.', where:'controller/UsuarioController.java',
+     code:`@PostMapping("/login")\npublic Usuario iniciarSesion(@Valid @RequestBody LoginRequest datos){\n    return usuarioService.iniciarSesion(datos);\n}`},
+    {at:2, tag:'LoginRequest', title:'El servicio aplica la lógica', text:'Busca al usuario por correo. Si no existe, responde con el mismo mensaje que si la contraseña estuviera mal.', where:'service/UsuarioService.java',
+     code:`Usuario usuario = usuarioRepository.findByCorreo(datos.correo())\n    .orElseThrow(() -> new RuntimeException("Correo o contraseña incorrectos"));`},
+    {at:3, tag:'findByCorreo()', title:'El repositorio arma la consulta', text:'Spring Data JPA genera la consulta solo con leer el nombre del método. No escribimos SQL.', where:'Repository/UsuarioRepository.java',
+     code:`public interface UsuarioRepository extends JpaRepository<Usuario, UUID> {\n    Optional<Usuario> findByCorreo(String correo);\n}`},
+    {at:4, tag:'SELECT', title:'MySQL devuelve la fila', text:'Hibernate ejecuta el SELECT sobre la tabla USUARIO. Con show-sql=true se ve en la consola del backend.', where:'MySQL · tabla USUARIO',
+     code:`select u.id, u.nombre, u.correo, u.contrasena, u.rol, u.empresa_id\nfrom usuario u\nwhere u.correo = ?`},
+    {at:2, tag:'Usuario', back:true, title:'BCrypt compara la contraseña', text:'matches() toma la sal del hash guardado, recalcula y compara. La contraseña en texto plano nunca se guarda.', where:'service/UsuarioService.java',
+     code:`if (!cifrador.matches(datos.contrasena(), usuario.getContrasena())) {\n    throw new RuntimeException("Correo o contraseña incorrectos");\n}\nreturn usuario;`},
+    {at:0, tag:'200 OK', back:true, title:'El front guarda la sesión', text:'Llega el usuario sin la contraseña (WRITE_ONLY). El front lo guarda y muestra el menú según el rol.', where:'front · authService.guardarSesion()',
+     code:`// Respuesta 200\n{\n  "id": "6b1f…c42e",\n  "nombre": "Laura Gómez",\n  "correo": "empresa@tecnoandina.com",\n  "rol": "EMPRESA",\n  "empresa": { "id": "a3d9…71bf", "nombre": "TecnoAndina S.A.S" }\n}`}
+  ]},
+  reto:{ name:'Crear un reto', steps:[
+    {at:0, tag:'POST /reto', title:'La empresa llena el formulario', text:'RetoFormPage arma el reto. La empresa y la categoría viajan solo con su id.', where:'front · retos/services/retoService.js',
+     code:`guardarReto({\n  nombre: 'Tablero de rutas de entrega',\n  fechaInicio: '2026-08-03',\n  fechaFin: '2026-10-30',\n  estado: 'Publicado',\n  empresa: { id: empresaId },\n  categoria: { id: categoriaId },\n})`},
+    {at:1, tag:'POST /reto', title:'El controlador valida y responde 201', text:'@Valid revisa los @NotBlank y @NotNull del modelo Reto. Este controlador usa ResponseEntity para devolver 201 Created.', where:'controller/RetoController.java',
+     code:`@PostMapping\npublic ResponseEntity<Reto> crear(@Valid @RequestBody Reto reto) {\n    return ResponseEntity.status(HttpStatus.CREATED)\n        .body(retoService.guardaReto(reto));\n}`},
+    {at:2, tag:'Reto', title:'El servicio guarda', text:'Crear un reto no tiene reglas extra. Las reglas aparecen al borrarlo, cuando ya tiene postulaciones.', where:'service/RetoService.java',
+     code:`public Reto guardaReto (Reto reto){\n    return retoRepository.save(reto);\n}`},
+    {at:3, tag:'save()', title:'JPA decide si es INSERT o UPDATE', text:'save() viene heredado de JpaRepository. Como el reto no trae id, se genera un UUID y se inserta.', where:'Repository/RetoRepository.java',
+     code:`public interface RetoRepository extends JpaRepository<Reto, UUID> {\n    boolean existsByEmpresaId(UUID empresaId);\n    List<Reto> findByEmpresaId(UUID empresaId);\n}`},
+    {at:4, tag:'INSERT', title:'Se crea la fila en RETOS', text:'empresa_id y categoria_id quedan como llaves foráneas hacia EMPRESA y CATEGORIA.', where:'MySQL · tabla RETOS',
+     code:`insert into retos\n  (nombre, descripcion, fecha_inicio, fecha_fin,\n   estado, empresa_id, categoria_id, id)\nvalues (?, ?, ?, ?, ?, ?, ?, ?)`},
+    {at:0, tag:'201 Created', back:true, title:'El reto aparece en la lista', text:'El front recibe el reto con su id nuevo. Una cuenta EMPRESA solo verá los suyos gracias a GET /reto?empresaId=.', where:'front · retos/hooks/useDatosRetos.js',
+     code:`// Respuesta 201\n{\n  "id": "f02c…9a11",\n  "nombre": "Tablero de rutas de entrega",\n  "estado": "Publicado",\n  "empresa": { "id": "a3d9…71bf", "nombre": "TecnoAndina S.A.S" },\n  "categoria": { "id": "5e70…d2c3", "nombre": "Analítica de datos" }\n}`}
+  ]},
+  post:{ name:'Postularse a un reto', steps:[
+    {at:0, tag:'POST /registro', title:'El estudiante se postula', text:'postularse() arma el registro con estado INSCRITO y la fecha actual.', where:'front · registros/utils/accionesRegistro.js',
+     code:`export function postularse(usuario, reto, observacion) {\n  return guardarRegistro({\n    fechaRegistro: fechaHoraActual(),\n    observacion,\n    estado: 'INSCRITO',\n    usuario: { id: usuario.id },\n    reto: { id: reto.id },\n  })\n}`},
+    {at:1, tag:'POST /registro', title:'Llega a RegistroController', text:'El controlador valida el cuerpo y se lo pasa al servicio.', where:'controller/RegistroController.java',
+     code:`@PostMapping\npublic Registro guardarRegistro(@Valid @RequestBody Registro registro) {\n    return registroService.guardarRegistro(registro);\n}`},
+    {at:2, tag:'Registro', title:'El servicio revisa duplicados', text:'Antes de guardar, pregunta si este estudiante ya está en este reto.', where:'service/RegistroService.java',
+     code:`if (registroRepository.existsByUsuarioIdAndRetoId(\n        registro.getUsuario().getId(), registro.getReto().getId())) {\n    throw new ResponseStatusException(HttpStatus.CONFLICT,\n        "El usuario ya esta inscrito en este reto");\n}`},
+    {at:3, tag:'exists…()', title:'Consulta y guardado', text:'existsByUsuarioIdAndRetoId devuelve false, así que se llama a save().', where:'Repository/RegistroRepository.java',
+     code:`boolean existsByUsuarioIdAndRetoId(UUID usuarioId, UUID retoId);`},
+    {at:4, tag:'INSERT', title:'Se crea la fila en REGISTRO', text:'La restricción UNIQUE (id_usuario, id_reto) en la base respalda la misma regla, por si dos peticiones llegan a la vez.', where:'MySQL · tabla REGISTRO',
+     code:`@Table(name = "REGISTRO",\n  uniqueConstraints = @UniqueConstraint(\n    columnNames = {"id_usuario", "id_reto"}))`},
+    {at:0, tag:'200 OK', back:true, title:'Aparece en «Mis postulaciones»', text:'El portal muestra la postulación como INSCRITO. Desde ahí el estudiante puede cancelarla mientras no la acepten.', where:'front · portal/components/MiPostulacion.jsx',
+     code:`// Respuesta 200\n{\n  "id": "c81a…04de",\n  "estado": "INSCRITO",\n  "fechaRegistro": "2026-11-07T10:24:00",\n  "fechaAceptacion": null,\n  "aceptadoPor": null\n}`}
+  ]},
+  dup:{ name:'Postulación repetida (409)', steps:[
+    {at:0, tag:'POST /registro', title:'El mismo estudiante intenta otra vez', text:'Se envía un registro con el mismo usuario y el mismo reto.', where:'front · registros/services/registroService.js',
+     code:`guardarRegistro({ estado: 'INSCRITO',\n  usuario: { id: '6b1f…c42e' },\n  reto: { id: 'f02c…9a11' } })`},
+    {at:1, tag:'POST /registro', title:'Pasa la validación', text:'El JSON está bien formado, así que @Valid lo deja pasar. La regla está en el servicio.', where:'controller/RegistroController.java',
+     code:`@PostMapping\npublic Registro guardarRegistro(@Valid @RequestBody Registro registro)`},
+    {at:2, tag:'Registro', title:'El servicio pregunta si ya existe', text:'Antes de guardar consulta al repositorio.', where:'service/RegistroService.java',
+     code:`registroRepository.existsByUsuarioIdAndRetoId(usuarioId, retoId)`},
+    {at:4, tag:'true', back:true, title:'MySQL encuentra la fila', text:'Ya hay un registro con ese par usuario + reto.', where:'MySQL · tabla REGISTRO',
+     code:`select count(*) > 0 from registro\nwhere id_usuario = ? and id_reto = ?\n-- resultado: 1`},
+    {at:2, tag:'409', err:true, title:'Se corta con un 409 Conflict', text:'ResponseStatusException detiene todo antes del INSERT. No se guarda nada.', where:'service/RegistroService.java',
+     code:`throw new ResponseStatusException(HttpStatus.CONFLICT,\n    "El usuario ya esta inscrito en este reto");`},
+    {at:0, tag:'409 Conflict', err:true, title:'El front muestra el mensaje', text:'pedir() ve que la respuesta no es ok, lee el mensaje del cuerpo y lanza un Error que la pantalla muestra.', where:'front · core/lib/api.js',
+     code:`if (!respuesta.ok) {\n  const cuerpo = await respuesta.json()\n  mensaje = cuerpo.message || cuerpo.error || mensaje\n  throw new Error(mensaje)\n}`}
+  ]}
+};
+let scen = 'login', step = 0, timer = null;
+const segS = $('#scenarios');
+Object.entries(SC).forEach(([k,v]) => {
+  const b = document.createElement('button'); b.type='button'; b.textContent = v.name; b.dataset.k = k;
+  b.onclick = () => { stopPlay(); scen = k; showStep(0); };
+  segS.appendChild(b);
+});
+function placePacket(i, st){
+  const pk = $('#packet'), nodes = lane.querySelectorAll('.node');
+  const n = nodes[i]; if(!n) return;
+  const lr = lane.getBoundingClientRect(), dr = n.querySelector('.disc').getBoundingClientRect();
+  pk.style.left = (dr.left - lr.left + dr.width/2) + 'px';
+  pk.textContent = st.tag;
+  pk.className = 'packet' + (st.err ? ' err' : st.back ? ' back' : '');
+}
+function showStep(i){
+  const steps = SC[scen].steps; step = Math.max(0, Math.min(steps.length-1, i));
+  const st = steps[step];
+  segS.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', b.dataset.k===scen));
+  const visited = new Set(steps.slice(0, step).map(s => s.at));
+  lane.querySelectorAll('.node').forEach((n,j) => { n.classList.toggle('on', j===st.at); n.classList.toggle('done', j!==st.at && visited.has(j)); });
+  placePacket(st.at, st);
+  $('#stepCount').textContent = `Paso ${step+1} de ${steps.length}`;
+  $('#stepTitle').textContent = st.title;
+  $('#stepText').textContent = st.text;
+  $('#stepWhere').textContent = st.where;
+  $('#stepCode').innerHTML = hl(st.code);
+  $('#stepBar').style.width = ((step+1)/steps.length*100) + '%';
+  $('#prevStep').disabled = step===0;
+  $('#nextStep').disabled = step===steps.length-1;
+}
+function stopPlay(){ clearInterval(timer); timer=null; $('#playStep').textContent='▶ Reproducir'; }
+$('#prevStep').onclick = () => { stopPlay(); showStep(step-1); };
+$('#nextStep').onclick = () => { stopPlay(); showStep(step+1); };
+$('#playStep').onclick = () => {
+  if(timer){ stopPlay(); return; }
+  if(step === SC[scen].steps.length-1) showStep(0);
+  $('#playStep').textContent='❚❚ Pausar';
+  timer = setInterval(() => { if(step >= SC[scen].steps.length-1){ stopPlay(); return; } showStep(step+1); }, 2600);
+};
+addEventListener('resize', () => placePacket(SC[scen].steps[step].at, SC[scen].steps[step]));
+showStep(0);
+
+/* ---------- Capas ---------- */
+const LAYERS = [
+  {name:'Controller', pkg:'controller/', sub:'Recibe y responde HTTP', title:'Controller: la puerta de entrada',
+   text:'Define las rutas con @RequestMapping y @GetMapping, @PostMapping, @PutMapping o @DeleteMapping. Convierte el JSON en objetos, activa @Valid y le pasa el trabajo al servicio. No tiene lógica de negocio.',
+   files:['UsuarioController','EmpresaController','CategoriaContoller','RetoController','RegistroController'],
+   code:`@RestController\n@CrossOrigin(origins = "http://localhost:5173")\n@RequestMapping("/api/v1/empresa")\npublic class EmpresaController {\n\n    @GetMapping("/empresas")\n    public List<Empresa> listarEmpresas (){\n        return empresaService.listarEmpresas();\n    }\n}`},
+  {name:'Service', pkg:'service/', sub:'Reglas del negocio', title:'Service: donde viven las reglas',
+   text:'Aquí se decide si algo se puede hacer: correos repetidos, postulaciones duplicadas, borrados que dejarían huérfanos, cambios de estado y cifrado de contraseñas.',
+   files:['UsuarioService','EmpresaService','CategoriaService','RetoService','RegistroService'],
+   code:`public String borrarEmpresa (UUID id){\n    if (retoRepository.existsByEmpresaId(id)) {\n        throw new RuntimeException("La empresa tiene retos asociados");\n    }\n    if (usuarioRepository.existsByEmpresaId(id)) {\n        throw new RuntimeException("La empresa tiene usuarios asociados");\n    }\n    empresaRepository.deleteById(id);\n    return "Se ha borrado con exito";\n}`},
+  {name:'Repository', pkg:'Repository/', sub:'Acceso a datos', title:'Repository: hablar con MySQL sin escribir SQL',
+   text:'Interfaces que extienden JpaRepository. Ya traen save, findById, findAll y deleteById. Los métodos extra como existsByEmpresaId se generan solos a partir de su nombre.',
+   files:['UsuarioRepository','EmpresaRepository','CategoriaRepository','RetoRepository','RegistroRepository'],
+   code:`@Repository\npublic interface RegistroRepository extends JpaRepository<Registro, UUID> {\n    boolean existsByUsuarioIdAndRetoId(UUID usuarioId, UUID retoId);\n    boolean existsByRetoId(UUID retoId);\n    boolean existsByUsuarioId(UUID usuarioId);\n}`},
+  {name:'Model · DTO · Enums', pkg:'model/ dto/ enums/', sub:'La forma de los datos', title:'Model: cada clase es una tabla',
+   text:'Las entidades JPA (@Entity) definen columnas, relaciones y validaciones. LoginRequest es un DTO solo para el login. Los enums ROLES, EstadoRegistro y AREAS fijan los valores permitidos.',
+   files:['Usuario','Empresa','Categoria','Reto','Registro','LoginRequest','ROLES','EstadoRegistro','AREAS'],
+   code:`@Entity\n@Table(name = "USUARIO")\npublic class Usuario {\n    @Id\n    @GeneratedValue(strategy = GenerationType.UUID)\n    private UUID id;\n\n    @Email @NotBlank @Column(unique = true)\n    private String correo;\n\n    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)\n    private String contrasena;\n}`}
+];
+const stack = $('#stack');
+LAYERS.forEach((l,i) => {
+  if(i) { const d = document.createElement('div'); d.className='down'; d.textContent='▼'; d.setAttribute('aria-hidden','true'); stack.appendChild(d); }
+  const b = document.createElement('button'); b.type='button'; b.className='layer';
+  b.innerHTML = `<span class="lv">0${i+1}</span><div><b>${l.name}</b><span>${l.sub}</span></div><span class="pkg">${l.pkg}</span>`;
+  b.onclick = () => showLayer(i);
+  stack.appendChild(b);
+});
+function showLayer(i){
+  stack.querySelectorAll('.layer').forEach((b,j) => b.setAttribute('aria-pressed', j===i));
+  const l = LAYERS[i];
+  $('#ldetail').innerHTML = `<div class="eyebrow">${esc(l.pkg)}</div><h3>${esc(l.title)}</h3><p class="muted">${esc(l.text)}</p>
+    <div class="files">${l.files.map(f => `<span class="chip">${f}.java</span>`).join('')}</div><pre class="code">${hl(l.code)}</pre>`;
+}
+showLayer(1);
+
+/* ---------- Endpoints ---------- */
+const U = '6b1f2e90-4c1d-4a7b-9f3e-1d2a8c5bc42e', E = 'a3d94b12-7e55-4c08-b1a6-0f9e2d4c71bf', C = '5e70c8a4-2b19-4f6d-8e33-a7c1b09fd2c3', R = 'f02c6d71-93be-4a58-bd2e-4e8f1c6a9a11', G = 'c81a3f55-6e02-4b97-a4c9-2d7e5b8104de';
+const ex = {
+  usuario:{id:U,nombre:'Laura Gómez',correo:'empresa@tecnoandina.com',rol:'EMPRESA',empresa:{id:E,nombre:'TecnoAndina S.A.S'}},
+  empresa:{id:E,nombre:'TecnoAndina S.A.S',nit:'900123456-7',sector:'Tecnología',contacto:'Laura Gómez',correo:'contacto@tecnoandina.com',telefono:'6045551234',activa:true},
+  categoria:{id:C,nombre:'Analítica de datos',descripcion:'Retos de tableros, reportes y análisis de información.',areaResponsable:'TECNOLOGIA'},
+  reto:{id:R,nombre:'Tablero de rutas de entrega',descripcion:'Diseñar un tablero que muestre los tiempos de entrega por zona.',fechaInicio:'2026-08-03',fechaFin:'2026-10-30',estado:'Publicado',empresa:{id:E},categoria:{id:C}},
+  registro:{id:G,fechaRegistro:'2026-11-07T10:24:00',observacion:'Me interesa el análisis de datos',estado:'INSCRITO',usuario:{id:U},reto:{id:R},fechaAceptacion:null,aceptadoPor:null}
+};
+const noId = o => { const c = {...o}; delete c.id; return c; };
+const J = o => JSON.stringify(o, null, 2);
+const API = {
+  usuario:{label:'Usuarios', svc:'auth/services/authService.js', eps:[
+    {m:'POST',p:'/usuario/registro',d:'Crear una cuenta',fn:'registrar(usuario)',rules:'Correo único. Si el rol es EMPRESA debe venir la empresa. La contraseña se cifra con BCrypt antes de guardar.',body:J({nombre:'Laura Gómez',correo:'empresa@tecnoandina.com',contrasena:'123456',rol:'EMPRESA',empresa:{id:E}}),res:J(ex.usuario)},
+    {m:'POST',p:'/usuario/login',d:'Iniciar sesión',fn:'iniciarSesion(correo, contrasena)',rules:'Busca por correo y compara con BCrypt. La respuesta no incluye la contraseña.',body:J({correo:'empresa@tecnoandina.com',contrasena:'123456'}),res:J(ex.usuario)},
+    {m:'GET',p:'/usuario/usuarios',d:'Listar usuarios',fn:'listarUsuarios()',rules:'Devuelve todos los usuarios, sin contraseña.',res:J([ex.usuario])},
+    {m:'DELETE',p:'/usuario/{id}',d:'Borrar un usuario',fn:'borrarUsuario(id)',rules:'No se borra si tiene postulaciones asociadas.',res:'"Se ha borrado con exito"'}
+  ]},
+  empresa:{label:'Empresas', svc:'empresas/services/empresaService.js', eps:[
+    {m:'POST',p:'/empresa',d:'Crear una empresa',fn:'guardarEmpresa(empresa)',rules:'Valida correo, teléfono de 7 a 15 caracteres y campos obligatorios.',body:J(noId(ex.empresa)),res:J(ex.empresa)},
+    {m:'GET',p:'/empresa/empresas',d:'Listar empresas',fn:'listarEmpresas()',rules:'Devuelve todas las empresas.',res:J([ex.empresa])},
+    {m:'GET',p:'/empresa/{id}',d:'Ver una empresa',fn:'buscarEmpresaPorId(id)',rules:'Si no existe: «Empresa no encontrada».',res:J(ex.empresa)},
+    {m:'PUT',p:'/empresa/actualizar/{id}',d:'Editar una empresa',fn:'actualizarEmpresa(id, empresa)',rules:'Busca la empresa y reemplaza sus campos.',body:J({...noId(ex.empresa),activa:false}),res:J({...ex.empresa,activa:false})},
+    {m:'DELETE',p:'/empresa/{id}',d:'Borrar una empresa',fn:'borrarEmpresa(id)',rules:'No se borra si tiene retos o usuarios asociados.',res:'"Se ha borrado con Exito"'}
+  ]},
+  categoria:{label:'Categorías', svc:'categorias/services/categoriaService.js', eps:[
+    {m:'POST',p:'/categoria',d:'Crear una categoría',fn:'guardarCategoria(categoria)',rules:'Nombre único. areaResponsable debe ser un valor del enum AREAS.',body:J(noId(ex.categoria)),res:J(ex.categoria)},
+    {m:'GET',p:'/categoria/categorias',d:'Listar categorías',fn:'listarCategorias()',rules:'Devuelve todas las categorías.',res:J([ex.categoria])},
+    {m:'GET',p:'/categoria/{id}',d:'Ver una categoría',fn:'buscarCategoriaPorId(id)',rules:'Si no existe: «Categoria no encontrada».',res:J(ex.categoria)},
+    {m:'PUT',p:'/categoria/actualizar/{id}',d:'Editar una categoría',fn:'actualizarCategoria(id, categoria)',rules:'Actualiza nombre, descripción y área.',body:J(noId(ex.categoria)),res:J(ex.categoria)},
+    {m:'DELETE',p:'/categoria/{id}',d:'Borrar una categoría',fn:'borrarCategoria(id)',rules:'No se borra si tiene retos asociados.',res:'"Se ha borrado con exito"'}
+  ]},
+  reto:{label:'Retos', svc:'retos/services/retoService.js', eps:[
+    {m:'POST',p:'/reto',d:'Crear un reto',fn:'guardarReto(reto)',rules:'Empresa y categoría obligatorias. Responde 201 Created.',body:J(noId(ex.reto)),res:J(ex.reto)},
+    {m:'GET',p:'/reto?empresaId=',d:'Listar retos (filtro opcional)',fn:'listarRetos(empresaId)',rules:'Sin parámetro trae todos. Con empresaId trae solo los de esa empresa: así una cuenta EMPRESA ve solo los suyos.',res:J([ex.reto])},
+    {m:'GET',p:'/reto/{id}',d:'Ver un reto',fn:'buscarRetoPorId(id)',rules:'Si no existe: «Reto no encontrado».',res:J(ex.reto)},
+    {m:'PUT',p:'/reto/{id}',d:'Editar un reto',fn:'actualizarReto(id, reto)',rules:'Reemplaza todos los campos, incluidas empresa y categoría.',body:J({...noId(ex.reto),estado:'En curso'}),res:J({...ex.reto,estado:'En curso'})},
+    {m:'DELETE',p:'/reto/{id}',d:'Borrar un reto',fn:'borrarReto(id)',rules:'No se borra si tiene postulaciones.',res:'"Se ha borrado con exito"'}
+  ]},
+  registro:{label:'Postulaciones', svc:'registros/services/registroService.js', eps:[
+    {m:'POST',p:'/registro',d:'Postularse a un reto',fn:'guardarRegistro(registro)',rules:'Un estudiante no puede postularse dos veces al mismo reto: responde 409.',body:J({fechaRegistro:'2026-11-07T10:24:00',observacion:'Me interesa el análisis de datos',estado:'INSCRITO',usuario:{id:U},reto:{id:R}}),res:J(ex.registro)},
+    {m:'GET',p:'/registro/registros',d:'Listar postulaciones',fn:'listarRegistros()',rules:'Devuelve todas las postulaciones con su usuario y su reto.',res:J([ex.registro])},
+    {m:'GET',p:'/registro/{id}',d:'Ver una postulación',fn:'buscarRegistroPorId(id)',rules:'Si no existe: «Registro no encontrado».',res:J(ex.registro)},
+    {m:'PUT',p:'/registro/actualizar/{id}',d:'Aceptar o finalizar',fn:'actualizarRegistro(id, registro)',rules:'Si cambia el estado, guarda la fecha y quién lo hizo (gestionadoPor → aceptadoPor o finalizadoPor).',body:J({...noId(ex.registro),estado:'EN_PROCESO',gestionadoPor:{id:'2c4e…admin'}}),res:J({...ex.registro,estado:'EN_PROCESO',fechaAceptacion:'2026-11-08T09:00:00',aceptadoPor:{id:'2c4e…admin',nombre:'Coordinación CESDE'}})},
+    {m:'DELETE',p:'/registro/{id}',d:'Cancelar una postulación',fn:'borrarRegistro(id)',rules:'Solo mientras está INSCRITO. Si ya fue aceptada o finalizada responde 409.',res:'"Registro eliminado"'}
+  ]}
+};
+let res = 'usuario', epi = 1;
+const segR = $('#resources');
+Object.entries(API).forEach(([k,v]) => {
+  const b = document.createElement('button'); b.type='button'; b.dataset.k=k;
+  b.textContent = `${v.label} · ${v.eps.length}`;
+  b.onclick = () => { res = k; epi = 0; renderApi(); };
+  segR.appendChild(b);
+});
+function renderApi(){
+  segR.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', b.dataset.k===res));
+  const r = API[res];
+  $('#eplist').innerHTML = r.eps.map((e,i) => `<button type="button" class="ep" aria-pressed="${i===epi}" data-i="${i}"><span class="m ${e.m}">${e.m}</span><span class="path">${esc(e.p)}</span><span class="d">${esc(e.d)}</span></button>`).join('');
+  $('#eplist').querySelectorAll('.ep').forEach(b => b.onclick = () => { epi = +b.dataset.i; renderApi(); });
+  const e = r.eps[epi];
+  const full = 'http://localhost:8080/api/v1' + e.p.replace('{id}', (ex[res]||{}).id || '{id}').replace('?empresaId=', '?empresaId=' + E);
+  const curl = `curl -X ${e.m} "${full}"` + (e.body ? ` \\\n  -H "Content-Type: application/json" \\\n  -d '${JSON.stringify(JSON.parse(e.body))}'` : '');
+  $('#epdetail').innerHTML = `
+    <div class="url"><span class="m ${e.m}">${e.m}</span><div><span>/api/v1</span>${esc(e.p)}</div></div>
+    <dl class="kv">
+      <dt>Qué hace</dt><dd>${esc(e.d)}</dd>
+      <dt>Reglas</dt><dd>${esc(e.rules)}</dd>
+      <dt>Lo llama</dt><dd><code>${esc(e.fn)}</code> en <code>${esc(r.svc)}</code></dd>
+    </dl>
+    ${e.body ? `<div class="lbl2">Cuerpo que envía el front</div><pre class="code">${hl(e.body)}</pre>` : ''}
+    <div class="lbl2">Respuesta</div><pre class="code">${hl(e.res)}</pre>
+    <div class="lbl2">Probar desde la terminal <button type="button" class="copy" id="copyCurl">copiar curl</button></div>`;
+  $('#copyCurl').onclick = ev => copy(curl, ev.currentTarget);
+}
+renderApi();
+
+/* ---------- Copiar ---------- */
+function copy(text, btn){
+  const old = btn.textContent;
+  const done = ok => { btn.textContent = ok ? 'copiado' : 'selecciona y copia'; setTimeout(() => btn.textContent = old, 1400); };
+  try{ navigator.clipboard.writeText(text).then(() => done(true), () => done(false)); }catch(e){ done(false); }
+}
+document.querySelectorAll('[data-copy]').forEach(b => b.onclick = () => copy(b.dataset.copy, b));
+
+/* ---------- Diagrama ER ---------- */
+const TABLES = {
+  usuario:{x:20,y:20,t:'USUARIO',f:[['id','UUID','pk'],['nombre','varchar'],['correo','único'],['contrasena','BCrypt'],['rol','ROLES'],['empresa_id','FK · opcional','fk']],
+    info:'Las cuentas del sistema. El rol decide qué ve cada quien en el front. Solo las cuentas EMPRESA llevan empresa_id.'},
+  empresa:{x:330,y:20,t:'EMPRESA',f:[['id','UUID','pk'],['nombre','varchar'],['nit','varchar'],['sector','varchar'],['contacto','varchar'],['correo','email'],['telefono','7–15'],['activa','boolean']],
+    info:'Las organizaciones aliadas. Una empresa tiene muchos retos y puede tener varias cuentas de usuario.'},
+  categoria:{x:640,y:300,t:'CATEGORIA',f:[['id','UUID','pk'],['nombre','único'],['descripcion','TEXT'],['area_responsable','AREAS']],
+    info:'Clasifica los retos. area_responsable usa el enum AREAS (TECNOLOGIA, MARKETING, LOGISTICA y otras 16).'},
+  reto:{x:330,y:300,t:'RETOS',f:[['id','UUID','pk'],['nombre','varchar'],['descripcion','TEXT'],['fecha_inicio','date'],['fecha_fin','date'],['estado','varchar'],['empresa_id','FK','fk'],['categoria_id','FK','fk']],
+    info:'El problema real que propone una empresa. Pertenece a una empresa y a una categoría, y recibe muchas postulaciones.'},
+  registro:{x:20,y:300,t:'REGISTRO',f:[['id','UUID','pk'],['fecha_registro','datetime'],['observacion','varchar'],['estado','EstadoRegistro'],['fecha_aceptacion','datetime'],['fecha_finalizacion','datetime'],['id_usuario','FK','fk'],['id_reto','FK','fk'],['aceptado_por','FK','fk'],['finalizado_por','FK','fk']],
+    info:'La postulación de un estudiante a un reto. UNIQUE (id_usuario, id_reto). Guarda quién la aceptó y quién la finalizó, ambos apuntando a USUARIO.'}
+};
+const W = 220, HH = 34, LH = 21;
+const hOf = t => HH + t.f.length*LH + 12;
+const RELS = [
+  {a:'usuario', b:'empresa', opt:true, d:'M240 95 H330', lab:[285,86,'empresa_id'], ca:[248,110,'N'], cb:[320,110,'1']},
+  {a:'reto', b:'empresa', d:'M440 300 V226', lab:[448,268,'empresa_id'], ca:[428,292,'N'], cb:[428,242,'1']},
+  {a:'reto', b:'categoria', d:'M550 380 H640', lab:[595,371,'categoria_id'], ca:[558,396,'N'], cb:[630,396,'1']},
+  {a:'registro', b:'reto', d:'M240 380 H330', lab:[285,371,'id_reto'], ca:[248,396,'N'], cb:[320,396,'1']},
+  {a:'registro', b:'usuario', d:'M130 300 V184', lab:[138,236,'id_usuario'], lab2:[138,252,'aceptado_por'], lab3:[138,268,'finalizado_por'], ca:[118,292,'N'], cb:[118,200,'1']}
+];
+const er = $('#er');
+let svg = '';
+RELS.forEach((r,i) => {
+  svg += `<g class="rel" data-a="${r.a}" data-b="${r.b}"><path d="${r.d}" class="${r.opt?'opt':''}"/>`;
+  [r.lab, r.lab2, r.lab3].forEach(l => { if(l) svg += `<text x="${l[0]}" y="${l[1]}" text-anchor="${r.d.includes('V')?'start':'middle'}">${l[2]}</text>`; });
+  svg += `<text class="card" x="${r.ca[0]}" y="${r.ca[1]}" text-anchor="middle">${r.ca[2]}</text><text class="card" x="${r.cb[0]}" y="${r.cb[1]}" text-anchor="middle">${r.cb[2]}</text></g>`;
+});
+Object.entries(TABLES).forEach(([k,t]) => {
+  const h = hOf(t);
+  svg += `<g class="box" data-k="${k}" tabindex="0" role="button" aria-label="Tabla ${t.t}">
+    <rect class="bg" x="${t.x}" y="${t.y}" width="${W}" height="${h}" rx="12"/>
+    <path class="hdp" d="M${t.x+1} ${t.y+HH} V${t.y+12} a11 11 0 0 1 11 -11 H${t.x+W-12} a11 11 0 0 1 11 11 V${t.y+HH} Z" fill="var(--surface-2)"/>
+    <line x1="${t.x}" x2="${t.x+W}" y1="${t.y+HH}" y2="${t.y+HH}" stroke="var(--line)"/>
+    <text class="tt" x="${t.x+14}" y="${t.y+22}">${t.t}</text>`;
+  t.f.forEach((f,i) => {
+    const y = t.y + HH + 20 + i*LH;
+    svg += `<text class="${f[2]||''}" x="${t.x+14}" y="${y}">${f[0]}</text><text class="ty" x="${t.x+W-14}" y="${y}" text-anchor="end">${f[1]}</text>`;
+  });
+  svg += `</g>`;
+});
+er.innerHTML = svg;
+function focusTable(k){
+  er.classList.toggle('focus', !!k);
+  const related = new Set([k]);
+  er.querySelectorAll('.rel').forEach(r => { const on = r.dataset.a===k || r.dataset.b===k; r.classList.toggle('hl', on); if(on){ related.add(r.dataset.a); related.add(r.dataset.b); } });
+  er.querySelectorAll('.box').forEach(b => { b.classList.toggle('hl', related.has(b.dataset.k)); b.classList.toggle('main', b.dataset.k===k); });
+  const side = $('#erside');
+  if(!k){ side.innerHTML = `<div class="eyebrow">Toca una tabla</div><p class="muted">La línea punteada es una relación opcional: solo las cuentas con rol EMPRESA están ligadas a una empresa. N:1 significa que muchas filas de un lado apuntan a una sola del otro.</p>`; return; }
+  const t = TABLES[k];
+  const rels = RELS.filter(r => r.a===k || r.b===k).map(r => r.a===k ? `muchos ${TABLES[k].t} → un ${TABLES[r.b].t}` : `un ${TABLES[k].t} ← muchos ${TABLES[r.a].t}`);
+  side.innerHTML = `<div class="eyebrow">${t.t}</div><h3>${esc(t.info)}</h3><div class="files">${rels.map(x => `<span class="chip">${x}</span>`).join('')}</div><button class="btn" type="button" id="erClear" style="align-self:flex-start">Ver todas</button>`;
+  $('#erClear').onclick = () => focusTable(null);
+}
+er.querySelectorAll('.box').forEach(b => {
+  b.addEventListener('click', () => focusTable(b.dataset.k));
+  b.addEventListener('keydown', e => { if(e.key==='Enter'||e.key===' '){ e.preventDefault(); focusTable(b.dataset.k); } });
+});
+focusTable(null);
+
+/* ---------- Roles ---------- */
+const MENU = ['Inicio','Retos','Empresas','Usuarios','Categorías'];
+const ROLES = {
+  CESDE:{name:'CESDE', who:'Coordinación académica', menu:[1,1,1,1,1], portal:true,
+    title:'Administra toda la plataforma',
+    can:['Crea, edita y borra empresas, usuarios y categorías.','Ve todos los retos de todas las empresas.','Acepta postulaciones (EN_PROCESO) y las finaliza.','También puede entrar al portal y ver lo que ven los estudiantes.'],
+    eps:['GET /empresa/empresas','POST /categoria','GET /usuario/usuarios','GET /reto','PUT /registro/actualizar/{id}']},
+  EMPRESA:{name:'Empresa', who:'TecnoAndina S.A.S', menu:[1,1,0,0,0], portal:true,
+    title:'Gestiona solo sus propios retos',
+    can:['Al registrarse elige a qué empresa pertenece; el backend lo exige.','Ve únicamente los retos de su empresa.','Crea retos con su empresa ya fijada en el formulario.','Acepta y finaliza las postulaciones de sus retos.'],
+    eps:['GET /reto?empresaId={id}','POST /reto','PUT /reto/{id}','PUT /registro/actualizar/{id}']},
+  ESTUDIANTE:{name:'Estudiante', who:'Portal de retos', menu:[0,0,0,0,0], portal:true, student:true,
+    title:'Explora retos y se postula',
+    can:['Entra directo al portal: no ve el panel de administración.','Explora los retos publicados y abre su detalle.','Se postula con una observación (queda INSCRITO).','Ve sus postulaciones y puede cancelarlas mientras sigan INSCRITO.'],
+    eps:['GET /reto','GET /reto/{id}','POST /registro','DELETE /registro/{id}']}
+};
+let role = 'CESDE';
+const segRole = $('#roleSeg');
+Object.entries(ROLES).forEach(([k,v]) => {
+  const b = document.createElement('button'); b.type='button'; b.dataset.k=k; b.textContent=v.name;
+  b.onclick = () => { role = k; renderRole(); };
+  segRole.appendChild(b);
+});
+function renderRole(){
+  segRole.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', b.dataset.k===role));
+  const r = ROLES[role];
+  $('#mock').innerHTML = `<div class="mh">${r.student ? 'Portal CESDE Retos' : 'Panel de administración'}<small>${esc(r.who)}</small></div>` +
+    (r.student
+      ? ['Explorar retos','Mis postulaciones'].map((m,i) => `<div class="mi ${i===0?'on':''}"><span>${m}</span></div>`).join('') + MENU.map(m => `<div class="mi off"><span>${m}</span></div>`).join('')
+      : MENU.map((m,i) => `<div class="mi ${r.menu[i] ? (i===1?'on':'') : 'off'}"><span>${m}</span></div>`).join(''));
+  $('#rolecard').innerHTML = `<div class="eyebrow">rol = "${role}"</div><h3>${esc(r.title)}</h3>
+    <ul class="can">${r.can.map(c => `<li>${esc(c)}</li>`).join('')}</ul>
+    <div class="lbl2">Endpoints que más usa</div><div class="eps">${r.eps.map(e => `<span class="chip">${esc(e)}</span>`).join('')}</div>`;
+}
+renderRole();
+
+/* ---------- Postulación ---------- */
+let P;
+function resetP(){
+  P = {id:G, estado:'INSCRITO', fechaRegistro:'2026-11-07T10:24:00', observacion:'Me interesa el análisis de datos', fechaAceptacion:null, fechaFinalizacion:null,
+    usuario:{id:U, nombre:'Mateo Ríos'}, reto:{id:R, nombre:'Tablero de rutas de entrega'}, aceptadoPor:null, finalizadoPor:null, gone:false};
+  renderP(); setLog('Postulación creada con <code>POST /registro</code>. Estado inicial: INSCRITO.', '');
+}
+function setLog(h, cls){ const l = $('#plog'); l.innerHTML = h; l.className = 'log ' + cls; }
+function renderP(){
+  const order = ['INSCRITO','EN_PROCESO','FINALIZADO'], idx = order.indexOf(P.estado);
+  order.forEach((s,i) => { const el = $('#s'+s); el.className = 'st' + (P.gone ? ' gone' : i===idx ? ' now' : i<idx ? ' past' : ''); });
+  const o = {...P}; delete o.gone;
+  $('#pjson').innerHTML = P.gone ? hl('// DELETE /registro/' + G.slice(0,8) + '…\n// 200 OK → "Registro eliminado"\n// La fila ya no existe en REGISTRO') : hl('// Fila en REGISTRO\n' + J(o));
+  $('#bAceptar').disabled = P.gone || P.estado !== 'INSCRITO';
+  $('#bFinalizar').disabled = P.gone || P.estado !== 'EN_PROCESO';
+  $('#bCancelar').disabled = P.gone;
+}
+$('#bAceptar').onclick = () => { P.estado='EN_PROCESO'; P.fechaAceptacion='2026-11-08T09:00:00'; P.aceptadoPor={id:'2c4e…', nombre:'Coordinación CESDE'}; renderP(); setLog('<code>PUT /registro/actualizar/{id}</code> con <code>gestionadoPor</code>. Se guardaron la fecha y quién aceptó.', 'ok'); };
+$('#bFinalizar').onclick = () => { P.estado='FINALIZADO'; P.fechaFinalizacion='2026-10-30T17:30:00'; P.finalizadoPor={id:U.slice(0,4)+'…', nombre:'Laura Gómez · TecnoAndina'}; renderP(); setLog('Finalizada. La aceptación anterior se conserva: cada transición queda guardada.', 'ok'); };
+$('#bCancelar').onclick = () => {
+  if(P.estado !== 'INSCRITO'){ setLog('<b>409 Conflict</b> · Solo se puede cancelar una postulación mientras está inscrita.', 'err'); return; }
+  P.gone = true; renderP(); setLog('<code>DELETE /registro/{id}</code>. Se canceló porque seguía en INSCRITO.', 'ok');
+};
+$('#bReset').onclick = resetP;
+resetP();
+
+/* ---------- BCrypt ---------- */
+const SAMPLE = '$2a$10$dgS6.62jv84zqmNkJvFpb.LvA8c/6DXrQBviq0GhWNOPso3ZJsY3a';
+let lastHash = SAMPLE;
+function showHash(h){
+  const parts = [h.slice(0,4), h.slice(4,7), h.slice(7,29), h.slice(29)];
+  $('#hashView').innerHTML = parts.map((p,i) => `<span class="h${i+1}">${esc(p)}</span>`).join('');
+}
+showHash(SAMPLE);
+const bc = window.dcodeIO && window.dcodeIO.bcrypt;
+if(!bc){ $('#bHash').disabled = true; $('#bMatch').disabled = true; $('#hashMsg').textContent = 'No se pudo cargar BCrypt en esta vista. El ejemplo de arriba es un hash real.'; }
+$('#bHash').onclick = () => {
+  const pw = $('#pw').value;
+  if(pw.length < 6){ $('#hashMsg').innerHTML = '<b style="color:var(--del)">400</b> · La contraseña debe tener mínimo 6 caracteres.'; return; }
+  $('#hashMsg').textContent = 'Cifrando con costo 10…';
+  setTimeout(() => {
+    const salt = bc.genSaltSync(10); lastHash = bc.hashSync(pw, salt); showHash(lastHash);
+    $('#hashMsg').textContent = 'Listo. Vuelve a cifrar: el hash cambia aunque la contraseña sea la misma.';
+  }, 20);
+};
+$('#bMatch').onclick = () => {
+  if(lastHash === SAMPLE){ $('#hashMsg').textContent = 'Primero cifra una contraseña.'; return; }
+  const ok = bc.compareSync($('#pw2').value, lastHash);
+  $('#hashMsg').innerHTML = ok ? '<b style="color:var(--get)">Coincide</b> · el login respondería 200 con el usuario.' : '<b style="color:var(--del)">No coincide</b> · «Correo o contraseña incorrectos».';
+};
+
+/* ---------- Hash inicial ---------- */
+if(location.hash){ const i = secs.findIndex(s => '#'+s.id === location.hash); if(i>=0) setCurrent(i); }
+})();
+</script>
+</body>
+</html>
